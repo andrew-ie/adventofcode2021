@@ -3,7 +3,7 @@ package dev.acraig.aoc.y2021
 import java.nio.file.Files
 import java.nio.file.Path
 
-fun day03part1(input: List<String>): Int {
+fun day03Part1(input: List<String>): Int {
     val gammaString = generateSequence("") { iteration ->
         val bitIndex = iteration.length
         if (bitIndex >= input.first().length) {
@@ -42,7 +42,7 @@ fun day03Part2(input: List<String>): Int {
 
 fun main() {
     val testdata = Files.readAllLines(Path.of("src/test/resources/day03testdata.txt"))
-    println("Test Data ${day03part1(testdata)}, ${day03Part2(testdata)}")
+    println("Test Data ${day03Part1(testdata)}, ${day03Part2(testdata)}")
     val data = Files.readAllLines(Path.of("data/day03.txt"))
-    println("Real Data ${day03part1(data)}, ${day03Part2(data)}")
+    println("Real Data ${day03Part1(data)}, ${day03Part2(data)}")
 }
