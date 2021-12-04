@@ -52,7 +52,7 @@ fun day04Part2(callout: List<Int>, boards: List<Board>):Int {
             }
         }
         Pair(newBoards, currentValue)
-    }.first { (result, _) -> result.all { it.completedOrder >= 0 } }
+    }.first { (result, _) -> result.all(Board::isCompletedRowOrColumn) }
     val (completedBoards, lastCall) = complete
     val completedBoard = completedBoards.maxByOrNull { it.completedOrder }!!
     val boardScore = completedBoard.numbers.filterNotNull().sum()
