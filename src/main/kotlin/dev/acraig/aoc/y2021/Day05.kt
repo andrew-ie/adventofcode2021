@@ -1,28 +1,30 @@
 package dev.acraig.aoc.y2021
 
 import java.io.File
-import kotlin.math.max
-import kotlin.math.min
 
 private data class Line(val startX: Int, val startY: Int, val endX: Int, val endY: Int) {
     fun buildPoints(): List<Pair<Int, Int>> {
-        val points = if (startX == endX) {
-            (min(startY, endY)..max(startY, endY)).map { y -> Pair(startX, y) }
-        } else if (startY == endY) {
-            (min(startX, endX)..max(startX, endX)).map { x -> Pair(x, startY) }
-        } else {
-            val startPoint = Pair(startX, startY)
-            generateSequence(startPoint) { currPoint ->
-                if (currPoint == Pair(endX, endY)) {
-                    null
-                } else {
-                    val newX = if (currPoint.first < endX) currPoint.first + 1 else currPoint.first - 1
-                    val newY = if (currPoint.second < endY) currPoint.second + 1 else currPoint.second - 1
-                    Pair(newX, newY)
-                }
-            }.toList()
-        }
+        val startPoint = Pair(startX, startY)
+        val endPoint = Pair(endX, endY)
+        val points = generateSequence(startPoint) { currPoint ->
+            if (currPoint == endPoint) {
+                null
+            } else {
+                val (currX, currY) = currPoint
+                val newX = next(currX, endX)
+                val newY = next(currY, endY)
+                Pair(newX, newY)
+            }
+        }.toList()
         return points
+    }
+
+    private fun next(current: Int, end: Int): Int {
+        return when {
+            current < end -> current + 1
+            current > end -> current - 1
+            else -> current
+        }
     }
 }
 
@@ -33,19 +35,12 @@ private fun buildLine(input: String): Line {
 }
 
 private fun day05(input: List<String>, filter: (Line) -> Boolean): Int {
-    val map = mutableMapOf<Pair<Int, Int>, Int>()
-    input.asSequence().map(::buildLine).filter(filter)
+    return input.asSequence().map(::buildLine).filter(filter)
         .flatMap(Line::buildPoints)
-        .forEach { point ->
-            map.compute(point) { _, currVal ->
-                if (currVal == null) {
-                    1
-                } else {
-                    currVal + 1
-                }
-            }
-        }
-    return map.values.filter { it > 1 }.size
+        .groupBy { point -> point }
+        .mapValues { (_, list) -> list.size }
+        .filterValues { count -> count > 1 }
+        .size
 }
 
 fun day05Part1(input: List<String>): Int {
