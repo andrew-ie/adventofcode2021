@@ -14,14 +14,14 @@ private fun day11(input: List<String>): Sequence<Pair<Map<Coordinate, Int>, Long
         val updatedEnergyLevels = currentPosition.mapValues { (_, value) -> value + 1 }
         val cascaded =
             generateSequence(updatedEnergyLevels to emptySet<Coordinate>()) { (repeatedEnergy, alreadyFlashed) ->
-                val flashPoints = repeatedEnergy.filterValues { it > 9 }.filterNot { alreadyFlashed.contains(it.key) }
+                val flashPoints = repeatedEnergy.filterValues { it > 9 }.keys - alreadyFlashed
                 if (flashPoints.isEmpty()) {
                     null
                 } else {
-                    val adjacent = flashPoints.flatMap { repeatedEnergy.findAdjacent(it.key) }.filterNot {
-                        alreadyFlashed.contains(it) || flashPoints.keys.contains(it)
-                    }
-                    repeatedEnergy.mapValues { (coordinate, level) -> level + adjacent.count { it == coordinate } } to alreadyFlashed + flashPoints.keys
+                    val adjacent = flashPoints.flatMap { repeatedEnergy.findAdjacent(it) }.groupBy { it }
+                    repeatedEnergy.mapValues { (coordinate, level) ->
+                        level + (adjacent[coordinate]?.size ?: 0)
+                    } to alreadyFlashed + flashPoints
                 }
             }.last()
         cascaded.first.mapValues { (_, level) -> if (level > 9) 0 else level } to flashCount + cascaded.second.size
