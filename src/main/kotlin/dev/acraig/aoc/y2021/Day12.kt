@@ -23,7 +23,7 @@ private fun Map<String, List<String>>.findPaths(
     val nextPossible = getOrDefault(currentPosition, emptyList())
     val visitedAnywhereTwice = previouslyVisited.any { (cave, count) -> cave.isSmallCave() && count > 1 }
     val routesToConsider = if (!allowSmallTwice || visitedAnywhereTwice) {
-        nextPossible - previouslyVisited.keys.filter { it.isSmallCave() }.toSet()
+        nextPossible - previouslyVisited.keys
     } else {
         nextPossible
     }
