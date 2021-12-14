@@ -9,23 +9,19 @@ fun day14(input: List<String>, vararg count: Int): List<Long> {
     val template = input.drop(2).map {
         it.split(" -> ")
     }.associate { (rule, next) -> rule to next }
-    val startPoint = start.windowed(2, partialWindows = true).mapIndexed { index, window ->
+    val startPoint = start.windowed(2).mapIndexed { index, window ->
         Key(window, index == 0)
     }
     return generateSequence(startPoint.associateWith { 1L }) { previous ->
         previous.flatMap { (key, count) ->
-            if (key.value.length == 1) {
-                listOf(key to 1L)
-            } else {
-                val infix = template[key.value]!!
-                val left = key.copy(value = "${key.value.substring(0, 1)}$infix")
-                val right = Key("$infix${key.value.substring(1)}")
-                listOf(left to count, right to count)
-            }
+            val infix = template[key.value]!!
+            val left = key.copy(value = "${key.value.substring(0, 1)}$infix")
+            val right = Key("$infix${key.value.substring(1)}")
+            listOf(left to count, right to count)
         }.groupBy { it.first }.mapKeys { (key, _) -> key }.mapValues { (_, value) -> value.sumOf { it.second } }
     }.filterIndexed { index, _ -> count.contains(index) }.take(count.size).map { counts ->
         val chCounts =
-            counts.flatMap { (key, value) -> if (key.isLeft) key.value.map { it to value } else listOf(key.value.first() to value) }
+            counts.flatMap { (key, value) -> if (key.isLeft) key.value.map { it to value } else listOf(key.value.last() to value) }
                 .groupBy { it.first }.mapValues { (_, pair) -> pair.sumOf { it.second } }
         val max = chCounts.maxOf { it.value }
         val min = chCounts.minOf { it.value }
