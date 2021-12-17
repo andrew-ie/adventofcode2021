@@ -11,9 +11,8 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
 }
 
 tasks.getByName<Test>("test") {
