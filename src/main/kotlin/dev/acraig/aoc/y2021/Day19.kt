@@ -41,6 +41,18 @@ data class Scanner(val id: Int, val coordinates: List<List<Int>>, val scannerPos
         }.take(4).flatMap { rotatedX -> generateSequence(rotatedX) { it.rotateY() }.take(4) }
             .flatMap { rotatedXAndY -> generateSequence(rotatedXAndY) { it.rotateZ() }.take(4) }.toSet()
     }
+    fun combine(other: Scanner, commonPoint: Pair<List<Int>, List<Int>>):Scanner {
+        val offset = commonPoint.first.mapIndexed { index, axisValue ->
+            axisValue - commonPoint.second[index]
+        }
+        val newPoints = other.coordinates.map { value ->
+            value.addOffset(offset)
+        }
+        return copy(
+            coordinates = (coordinates + newPoints).distinct(),
+            scannerPositions = scannerPositions + setOf(offset)
+        )
+    }
 }
 
 private fun buildScanners(input: String): List<Scanner> {
@@ -70,7 +82,7 @@ fun day19(input: String) {
         val foundScanners = nextMatch.keys.map { it.id }
         val result = nextMatch.entries.fold(scanner) { oldScanner, (newScanner, foundPoints) ->
             val entry = foundPoints.entries.first()
-            combineScanners(oldScanner, newScanner, entry.value.first(), entry.key)
+            oldScanner.combine(newScanner, entry.value.first() to entry.key)
         }
         if (foundScanners.isEmpty()) {
             null
@@ -87,31 +99,13 @@ fun day19(input: String) {
     println("Number of beacons: $part1. Max distance between two sensors: $part2")
 }
 
-fun distance(pos1: List<Int>, pos2: List<Int>): Long {
+private fun distance(pos1: List<Int>, pos2: List<Int>): Long {
     return pos1.foldIndexed(0L) { index, sum, value ->
         sum + abs(value - pos2[index]).toLong()
     }
 }
 
-fun combineScanners(
-    scanner0: Scanner,
-    scanner1: Scanner,
-    scanner0Location: List<Int>,
-    thisScannerLocation: List<Int>
-): Scanner {
-    val offset = scanner0Location.mapIndexed { index, axisValue ->
-        axisValue - thisScannerLocation[index]
-    }
-    val newPoints = scanner1.coordinates.map { value ->
-        value.addOffset(offset)
-    }
-    return scanner0.copy(
-        coordinates = (scanner0.coordinates + newPoints).distinct(),
-        scannerPositions = scanner0.scannerPositions + setOf(offset)
-    )
-}
-
-fun List<Int>.addOffset(extra: List<Int>): List<Int> {
+private fun List<Int>.addOffset(extra: List<Int>): List<Int> {
     return mapIndexed { index, original -> original + extra[index] }
 }
 
