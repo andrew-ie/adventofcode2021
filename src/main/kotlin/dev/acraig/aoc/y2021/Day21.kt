@@ -127,9 +127,8 @@ fun day21Part2(input: List<String>): Long {
                     }
                 }
                 val thisStepWinners = thisStep.flatMap { it.scores.entries }.filter { (k, _) -> k.any { it >= 21 } }
-                val totalWinners = thisStepWinners.sumOf { it.value }
-                val p2WinnerCount = thisStepWinners.filterNot { (key, _) -> key[0] >= 21 }.sumOf { (_, value) -> value }
-                val p1WinnerCount = totalWinners - p2WinnerCount
+                val p2WinnerCount = thisStepWinners.filter { (key, _) -> key[1] >= 21 }.sumOf { (_, value) -> value }
+                val p1WinnerCount = thisStepWinners.filter { (key, _) -> key[0] >= 21 }.sumOf { (_, value) -> value }
                 val nextRound = thisStep.map { universe ->
                     universe.copy(scores = universe.scores.filterKeys { score -> score.all { it < 21 } })
                 }.filterNot { it.scores.isEmpty() }
